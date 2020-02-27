@@ -12,8 +12,8 @@
     <body class="bg-light">
         <div class="container">
             <div class="py-5 text-center">
-                <img class="d-block mx-auto mb-4" src="https://getbootstrap.com/docs/4.0/assets/brand/bootstrap-solid.svg" alt="" width="72" height="72">
-                    <h2>لاراول</h2>
+                <img src="{{$rec->images["0"]}}"  class="d-block mx-auto mb-4" width="500px" >
+                    <h2>{{$rec->type}}   {{$rec->name}}</h2>
                 <p class="lead">لاراوا</p>
             </div>
 
@@ -27,10 +27,18 @@
                 <div class="card-header">
                   <h4 class="my-0 font-weight-normal">Free</h4>
                 </div>
-                <div class="card-body">
-                  <h1 class="card-title pricing-card-title">$0 <small class="text-muted">/ mo</small></h1>
-           
-                  <button type="button" class="btn btn-lg btn-block btn-outline-primary">Sign up for free</button>
+                <div class="row card-body">
+                    <div class="col my-auto">
+                        <button type="button" class="btn btn-lg btn-block btn-outline-primary">Sign up for free</button>
+                    </div>
+
+                    <div class="col my-auto">
+                        <img src="">
+                    </div>
+                    <div class="col my-auto">
+                      <h1 class="card-title pricing-card-title">$0 <small class="text-muted">/ mo</small></h1>
+                    </div>
+                  
                 </div>
               </div>
 
@@ -43,6 +51,10 @@
         <script src="/asset/js/jquery.min.js"></script>
         <script>
 
+  var idRoom="";
+  var start_date="{{$rec->start_date}}";
+  var end_date="{{$rec->end_date}}";
+  var rooms=<?php echo json_encode($rec->rooms, JSON_PRETTY_PRINT) ?>;
 
 
 
