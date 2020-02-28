@@ -16,7 +16,7 @@
     font-weight: bold;
 }
 
-.body {
+body {
     font-family: 'Vazir';
     font-weight: 2;
     font-size: 14px;
@@ -24,7 +24,9 @@
     overflow-y: auto;
   }
 
-
+img {
+  border-radius: 15px;
+}
   
 .lds-ellipsis {
     padding-right: 50%;

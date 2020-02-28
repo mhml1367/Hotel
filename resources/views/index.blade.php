@@ -7,6 +7,8 @@
         <title>رزرو بوم گردی</title>
         <link rel="stylesheet" href="/asset/css/style.css">
         <link rel="stylesheet" href="/asset/css/bootstrap.min.css">
+        <link href="/asset/css/persian-datepicker.css" rel="stylesheet">
+        <meta name="_token" content="{{ csrf_token() }}">
 
     </head>
     <body class="bg-light">
@@ -14,7 +16,6 @@
             <div class="py-5 text-center">
                 <img src="{{$rec->images["0"]}}"  class="d-block mx-auto mb-4" width="500px" >
                     <h2>{{$rec->type}}   {{$rec->name}}</h2>
-                <p class="lead">لاراوا</p>
             </div>
 
         </div>
@@ -25,18 +26,19 @@
 
             <div class="card mb-4 box-shadow">
               <div class="row card-body">
+
                   <div class="col my-auto">
-                      <button type="button" id="sub" class="btn btn-lg btn-block btn-outline-primary">جستجو</button>
+                        <label>تاریخ ورود</label>
+                      <input class="form-group" type="text" id="Start">
                   </div>
 
                   <div class="col my-auto">
-                      <input type="text" id="Start" value="1398/12/16">
+                      <label>تاریخ خروج</label>
+                      <input class="form-group" type="text" id="End">
                   </div>
-
                   <div class="col my-auto">
-                      <input type="text" id="End" value="1398/12/17">
-                  </div>
-                
+                        <button type="button" id="sub" class="btn btn-lg btn-block btn-outline-primary">جستجو</button>
+                </div>
               </div>
             </div>
 
@@ -45,10 +47,20 @@
           </div>
         </div>
 
-<div id="title" class="text-center"><h2>اتاق های موجود</h2></div>
-<div class="lds-ellipsis" id="loadig" style="display: none">
-  <div></div><div></div><div></div><div></div>
-</div>
+<div id="title" class="text-center"><h2></h2></div>
+
+    <div class="container">
+    <div class="row">
+    <div class="col pull-center">
+
+        <div class="lds-ellipsis text-center" id="loadig" style="display: none">
+        <div></div><div></div><div></div><div></div>
+        </div>
+
+
+    </div>
+    </div>
+    </div>
         <div class="container">
 
             <div id="HOTELS">
@@ -56,7 +68,6 @@
             </div>
 
           </div>
-
 
           <div class="modal fade" id="reserve" tabindex="-1" role="dialog" aria-labelledby="reserve" aria-hidden="true">
               <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -128,9 +139,25 @@
 
 
         <script src="/asset/js/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
-
+        <script src="/asset/js/bootstrap.min.js"></script>
+        <script src="/asset/js/notify.js"></script>
+        <script src="/asset/js/persian-date.js" ></script>
+        <script src="/asset/js/persian-datepicker.js" ></script>
         <script>
+$('#Start').persianDatepicker({
+    initialValue: true,
+    initialValueType: 'en',
+    format: "YYYY/MM/DD",
+    autoClose: true
+});
+
+$('#End').persianDatepicker({
+    initialValue: true,
+    initialValueType: 'en',
+    format: "YYYY/MM/DD",
+    autoClose: true
+});
+
 
   var idRoom="";
   var start_date="{{$rec->start_date}}";
@@ -138,6 +165,10 @@
   var rooms="<?php echo json_encode($rec->rooms, JSON_PRETTY_PRINT) ?>";
 
   $("#sub").click(function () {
+    document.getElementById('loadig').style.display = "initial";
+    document.getElementById("title").innerHTML ="<h2>درحال جستجو</h2>";
+    document.getElementById("HOTELS").innerHTML = "";
+    $('html,body').animate({ scrollTop: 500 }, 'slow');
 
         dataSend = {
             token: "mzoc1CEq401565108119FTd7QvbGea",
@@ -157,7 +188,7 @@ function DataHotel(dataSend) {
         url: 'http://recepshen.ir/api/fetchRooms',
         data: dataSend,
         success: function (D) {
-          $('html,body').animate({ scrollTop: 500 }, 'slow');
+          $('html,body').animate({ scrollTop: 900 }, 'slow');
 
             if(D["error"] == undefined){
                 if(D["data"].length != 0){
@@ -166,12 +197,20 @@ function DataHotel(dataSend) {
                 document.getElementById('loadig').style.display = "none";
 
             var FIELD= "";
+                rooms = D["data"]["rooms"];
             for (i = 0; i < D["data"]["rooms"].length; i++) {
                 FIELD += "<div class=\"card mb-4 box-shadow\">";
                 FIELD += "<div class=\"card-header\">";
                 FIELD += "<h4 class=\"my-0 font-weight-normal text-right\">"+ D["data"]["rooms"][i]["name"] +"</h4>";
                 FIELD += "</div>";
                 FIELD += "<div class=\"row card-body\">";
+                FIELD += "<div class=\"col my-auto\">";
+                FIELD += "<img src=\""+ D["data"]["rooms"][i]["images"][0] +"\">";
+                FIELD += "</div>";
+
+                FIELD += "<div class=\"col my-auto\">";
+                FIELD += "<div class=\"card-title pricing-card-title\">تعداد تخت"+ D["data"]["rooms"][i]["beds"] +"</div>";
+                FIELD += "</div>";
                 FIELD += "<div class=\"col my-auto\">";
                 FIELD += "<div class=\"row\">";
                 FIELD += "<div class=\"col my-auto\">";
@@ -184,12 +223,7 @@ function DataHotel(dataSend) {
                 FIELD += "</div>";
                 FIELD += "</div>";
                 FIELD += "</div>";
-                FIELD += "<div class=\"col my-auto\">";
-                FIELD += "<h2 class=\"card-title pricing-card-title\">تعداد تخت"+ D["data"]["rooms"][i]["beds"] +"</h2>";
-                FIELD += "</div>";
-                FIELD += "<div class=\"col my-auto\">";
-                FIELD += "<img src=\""+ D["data"]["rooms"][i]["images"][0] +"\">";
-                FIELD += "</div>";
+                
                 FIELD += "</div>";
                 FIELD += "</div>";
                
@@ -214,6 +248,121 @@ function DataHotel(dataSend) {
 
 };
 
+
+
+
+$('#reserve').on('show.bs.modal', function (event) {
+        var nameRoom = event.relatedTarget.dataset.nameroom;
+            idRoom = event.relatedTarget.dataset.idroom;
+        var id = event.relatedTarget.dataset.id;
+        var from = event.relatedTarget.dataset.from ;
+        var to = event.relatedTarget.dataset.to;
+        var capacity = event.relatedTarget.dataset.capacity;
+
+        var calc="";
+
+            calc += "<div class=\"col\">";
+            calc += "<div class=\"form-group\">";
+            calc += "<lable> تاریخ رفت: "+start_date+"</lable>";
+            calc += "</div>";
+            calc += "</div>";
+
+            calc += "<div class=\"col\">";
+            calc += "<div class=\"form-group\">";
+            calc += "<lable> تاریخ برگشت: "+end_date+"</lable>";
+            calc += "</div>";
+            calc += "</div>";
+
+            calc += "<div class=\"col\">";
+            calc += "<div class=\"form-group\">";
+            calc += "<lable > تعداد نفرات: "+capacity+"</lable>";
+            calc += "</div>";
+            calc += "</div>";
+
+
+        var contracts="";
+        var Titelcontracts = "<div class=\"col\"><label>انتخاب نوع اقامت:</label></div>";
+
+        for (az = 0; az < rooms[id].contracts.length; az++) {
+            var breakfast="";
+            var lunch="";
+            var dinner="";
+            var stay="";
+            
+            if (rooms[id].contracts[az].stay = 1) {
+                 stay = "اقامت";
+            }
+            if (rooms[id].contracts[az].breakfast == 1) {
+                 breakfast = "صبحانه";
+            }
+            if (rooms[id].contracts[az].lunch == 1) {
+                lunch = "نهار";
+            }
+            if (rooms[id].contracts[az].dinner == 1) {
+                dinner = "شام";
+            }
+            
+            contracts += "<div class=\"col\">";
+            contracts += "<div class=\"form-group\">";
+            contracts += "<input type=\"radio\" name=\"gender\" value=\""+rooms[id].contracts[az].id+"\"> "+ stay +" "+ breakfast +" "+ lunch +" "+ dinner +"<br>";
+            if (rooms[id].contracts[az].discount_price == null) {
+                contracts += (rooms[id].contracts[az].price + "").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+            }else{
+                contracts += (rooms[id].contracts[az].discount_price + "").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+                contracts += "<strike>"+(rooms[id].contracts[az].price + "").replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")+"</strike>";
+            }
+            contracts += " ريال </input>";
+            contracts += "</div>";
+            contracts += "</div>";
+        }
+        var modal = $(this)
+        // modal.find('.modal-title').text('New message to ' + recipient)
+        modal.find('#roomReserve').text("رزرو "+nameRoom);
+        modal.find('#Titelcontracts').html(Titelcontracts);
+        modal.find('#contracts').html(contracts);
+        modal.find('#calc').html(calc);
+        // modal.find('nameRoom').text(nameRoom)
+    });
+
+
+
+    $("#send").click(function () {
+        jQuery.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="_token"]').attr('content')
+            }
+        });
+    $.ajax({
+        type: 'POST',
+        url: "{{ route('post.hotels.reserve') }}",
+        data: {
+            hotel_id: "{{$rec->id}}",
+            room_id: idRoom,
+            contracts: $('input[name="gender"]:checked').val(),
+            first_name: $("#first_name").val(),
+            last_name: $("#last_name").val(),
+            national_code: $("#national_code").val(),
+            phone_number: $("#phone_number").val(),
+            phone_number: $("#phone_number").val(),
+            Sir_Madam: $("#Sir_Madam").val(),
+            city: $("#city").val(),
+            Foreign: $("#Foreign").val(),
+            start_date: "{{$rec->start_date}}",
+            end_date: "{{$rec->end_date}}",
+        },
+        success: function (Data) {
+            if (Data["status"] == 0) {
+                $("#send").notify(
+                    Data["error"], "error",
+                    { position:"right" }
+                );
+            }
+            if (Data["status"] == 1) {
+                window.location.replace(Data["data"]["payLink"]);
+            }
+        }
+    });
+});
         </script>
     </body>
 </html>
